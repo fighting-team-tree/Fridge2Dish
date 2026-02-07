@@ -83,14 +83,54 @@ export default function AnalyzePage() {
         </div>
       </div>
 
+      {/* Agent Message (Thought Signature) */}
+      {result.agent_message && (
+        <div className="mb-8 p-6 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
+            <span className="text-4xl text-emerald-400">🤖</span>
+          </div>
+          <h2 className="text-emerald-400 font-bold mb-2 flex items-center gap-2">
+            <span>AI 에이전트의 분석 노트</span>
+          </h2>
+          <p className="text-gray-200 leading-relaxed italic">
+            "{result.agent_message}"
+          </p>
+        </div>
+      )}
+
+      {/* Investigation Needed (Active Investigation) */}
+      {result.investigation_needed && result.investigation_needed.length > 0 && (
+        <div className="mb-8 p-6 bg-blue-500/10 border border-blue-500/30 rounded-2xl">
+          <h2 className="text-blue-400 font-bold mb-4 flex items-center gap-2">
+            <span>🔍 능동적 탐색: 추가 정보가 필요해요</span>
+          </h2>
+          <ul className="space-y-3">
+            {result.investigation_needed.map((item, idx) => (
+              <li key={idx} className="flex gap-3 text-gray-300 items-start">
+                <span className="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
+                  {idx + 1}
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <button 
+            onClick={() => router.push('/')}
+            className="mt-6 w-full py-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 rounded-xl text-blue-300 font-medium transition flex items-center justify-center gap-2"
+          >
+            <span>📸 추가 사진 찍으러 가기</span>
+          </button>
+        </div>
+      )}
+
       {/* Allergens Warning */}
       {result.allergens.length > 0 && (
-        <div className="mb-6 px-4 py-3 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center gap-3">
-          <span className="text-2xl">⚠️</span>
+        <div className="mb-8 px-6 py-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center gap-4">
+          <span className="text-3xl">⚠️</span>
           <div>
-            <p className="font-medium text-amber-400">알레르기 주의</p>
+            <p className="font-bold text-amber-400">알레르기 주의</p>
             <p className="text-sm text-gray-400">
-              감지된 알레르겐: {result.allergens.join(", ")}
+              분석된 알레르겐: {result.allergens.join(", ")}
             </p>
           </div>
         </div>
@@ -98,20 +138,20 @@ export default function AnalyzePage() {
 
       {/* Ingredients Grid */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">
+        <h2 className="text-xl font-bold mb-4">
           인식된 식재료 ({result.ingredients.length}개)
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {result.ingredients.map((ingredient) => {
             const isSelected = selectedIngredients.has(ingredient.name);
             return (
               <button
                 key={ingredient.name}
                 onClick={() => toggleIngredient(ingredient.name)}
-                className={`p-4 rounded-xl border text-left transition-all ${
+                className={`p-4 rounded-2xl border text-left transition-all duration-300 ${
                   isSelected
-                    ? "bg-emerald-500/20 border-emerald-500/50"
-                    : "bg-white/5 border-white/10 opacity-50"
+                    ? "bg-emerald-500/20 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+                    : "bg-white/5 border-white/10 opacity-50 hover:opacity-100"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -131,9 +171,20 @@ export default function AnalyzePage() {
                 <div className="text-sm text-gray-400">
                   {ingredient.quantity && <span>{ingredient.quantity}</span>}
                   {ingredient.condition && (
-                    <span className="ml-2 tag text-xs">{ingredient.condition}</span>
+                    <span className="ml-2 tag text-[10px] uppercase tracking-tighter">{ingredient.condition}</span>
                   )}
                 </div>
+                
+                {/* Expiry Badge */}
+                {ingredient.estimated_shelf_life_days !== undefined && (
+                  <div className={`mt-3 px-2 py-1 rounded-md text-[10px] font-bold inline-block ${
+                    ingredient.estimated_shelf_life_days <= 3 
+                      ? "bg-red-500/20 text-red-400 border border-red-500/30" 
+                      : "bg-white/5 text-gray-400"
+                  }`}>
+                    D-{ingredient.estimated_shelf_life_days}
+                  </div>
+                )}
               </button>
             );
           })}

@@ -12,6 +12,20 @@ export interface AnalyzeFridgeResponse {
   ingredients: Ingredient[];
   allergens: string[];
   analysis_confidence: number;
+  investigation_needed?: string[];
+  agent_message?: string;
+}
+
+export interface AgentMessage {
+  role: "agent";
+  content: string;
+  thought?: string;
+}
+
+export interface SessionState {
+  session_id: string;
+  current_step: "analysis" | "recipe_selection" | "cooking";
+  context: Record<string, any>;
 }
 
 export interface RecipePreferences {
@@ -32,7 +46,7 @@ export interface RecipeStep {
 }
 
 export interface NutritionInfo {
-  calories?: number;
+  calories?: string;
   protein?: string;
   carbs?: string;
   fat?: string;
@@ -69,4 +83,11 @@ export interface GeneratedImage {
 
 export interface GenerateFoodImagesResponse {
   images: GeneratedImage[];
+}
+
+export interface CookingFeedbackResponse {
+  status: "정상" | "주의" | "위험" | "완료";
+  feedback: string;
+  observation: string;
+  thought?: string;
 }

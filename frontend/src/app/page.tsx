@@ -72,6 +72,11 @@ export default function Home() {
       ingredients: sampleIngredients,
       allergens: ["egg"],
       analysis_confidence: 0.95,
+      investigation_needed: [
+        "검은색 비닐봉지 안에 무엇이 들어있는지 확인이 필요합니다.",
+        "우유의 유통기한이 잘 보이지 않아요. 날짜 부분을 더 가깝게 찍어주시겠어요?",
+      ],
+      agent_message: "냉장고 우측 하단에 있는 갈색 병은 질감과 라벨 디자인으로 보아 '굴소스'일 확률이 92%입니다. 이를 활용한 중식 볶음 요리를 추천해 드릴까요?",
     };
 
     sessionStorage.setItem("analyzeResult", JSON.stringify(sampleResult));

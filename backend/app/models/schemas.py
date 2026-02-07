@@ -18,6 +18,8 @@ class AnalyzeFridgeResponse(BaseModel):
     ingredients: list[Ingredient] = Field(default_factory=list, description="인식된 식재료 목록")
     allergens: list[str] = Field(default_factory=list, description="알레르겐 목록")
     analysis_confidence: float = Field(0.0, description="분석 신뢰도 (0~1)")
+    investigation_needed: Optional[list[str]] = Field(None, description="추가 정보가 필요한 품목 또는 요청 사항")
+    agent_message: Optional[str] = Field(None, description="사용자에게 보내는 에이전트의 메시지 (추론 과정 등 포함)")
 
 
 class RecipePreferences(BaseModel):
@@ -46,7 +48,7 @@ class RecipeStep(BaseModel):
 class NutritionInfo(BaseModel):
     """영양 정보."""
     
-    calories: Optional[int] = Field(None, description="칼로리 (kcal)")
+    calories: Optional[str] = Field(None, description="칼로리 (kcal, 숫자만 권장)")
     protein: Optional[str] = Field(None, description="단백질")
     carbs: Optional[str] = Field(None, description="탄수화물")
     fat: Optional[str] = Field(None, description="지방")
@@ -93,3 +95,34 @@ class GenerateFoodImagesResponse(BaseModel):
     """음식 이미지 생성 응답."""
     
     images: list[GeneratedImage] = Field(default_factory=list, description="생성된 이미지 목록")
+
+
+class AgentMessage(BaseModel):
+    """에이전트로부터의 메시지."""
+    
+    role: str = Field("agent", description="역할 (agent)")
+    content: str = Field(..., description="메시지 내용")
+    thought: Optional[str] = Field(None, description="에이전트의 추론 과정 (Thought Signature)")
+
+
+class SessionState(BaseModel):
+    """현재 세션 상태."""
+    
+    session_id: str = Field(..., description="세션 ID")
+    current_step: str = Field("analysis", description="현재 단계 (analysis, recipe_selection, cooking)")
+    context: dict = Field(default_factory=dict, description="현재 세션의 맥락 데이터")
+
+
+class CookingFeedbackRequest(BaseModel):
+    """요리 피드백 요청."""
+    
+    instruction: str = Field(..., description="현재 조리 단계 지침")
+
+
+class CookingFeedbackResponse(BaseModel):
+    """요리 피드백 응답."""
+    
+    status: str = Field(..., description="현재 상태 (정상, 주의, 위험, 완료)")
+    feedback: str = Field(..., description="피드백 메시지")
+    observation: str = Field(..., description="관찰 내용")
+    thought: Optional[str] = Field(None, description="에이전트의 추론 과정")

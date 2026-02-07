@@ -28,7 +28,7 @@ RECIPE_SYSTEM_PROMPT = """당신은 요리 전문가이자 레시피 개발자�
 - servings: 인분 수
 - ingredients: 필요한 재료 목록 (문자열 배열)
 - instructions: 조리 단계 (step_number, instruction, duration_minutes 포함)
-- nutrition: 영양 정보 (calories, protein, carbs, fat)
+- nutrition: 영양 정보 (calories는 숫자만, protein, carbs, fat 포함)
 - completion_image_prompt: 완성된 음식 이미지 생성용 상세 프롬프트 (영문, 50단어 이상)
 
 반드시 아래 JSON 형식으로만 응답하세요:
@@ -89,10 +89,16 @@ async def generate_recipes(
                 RecipeStep(**step) for step in recipe_data.get("instructions", [])
             ]
             
-            # 영양 정보 변환
+            # 영양 정보 변환 (AI 응답이 int 또는 str일 수 있으므로 모두 문자열로 변환)
             nutrition = None
             if recipe_data.get("nutrition"):
-                nutrition = NutritionInfo(**recipe_data["nutrition"])
+                nutrition_raw = recipe_data["nutrition"]
+                nutrition = NutritionInfo(
+                    calories=str(nutrition_raw.get("calories")) if nutrition_raw.get("calories") is not None else None,
+                    protein=str(nutrition_raw.get("protein")) if nutrition_raw.get("protein") else None,
+                    carbs=str(nutrition_raw.get("carbs")) if nutrition_raw.get("carbs") else None,
+                    fat=str(nutrition_raw.get("fat")) if nutrition_raw.get("fat") else None,
+                )
             
             recipe = Recipe(
                 id=recipe_data.get("id", f"r{i+1}"),

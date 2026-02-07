@@ -4,6 +4,7 @@ import {
   GenerateRecipesResponse,
   GenerateFoodImagesRequest,
   GenerateFoodImagesResponse,
+  CookingFeedbackResponse,
 } from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -64,6 +65,29 @@ export async function generateFoodImages(
 
   if (!response.ok) {
     throw new Error(`이미지 생성 실패: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * 현재 조리 상태에 대한 피드백을 가져옵니다.
+ */
+export async function getCookingFeedback(
+  file: File,
+  instruction: string
+): Promise<CookingFeedbackResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("instruction", instruction);
+
+  const response = await fetch(`${API_BASE_URL}/api/cooking-feedback`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`피드백 가져오기 실패: ${response.statusText}`);
   }
 
   return response.json();

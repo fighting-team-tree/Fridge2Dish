@@ -217,9 +217,19 @@ export default function RecipeDetailPage() {
       )}
 
       {/* Start Cooking Button */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2">
-        <button onClick={() => router.push("/")} className="btn-primary shadow-2xl">
-          🏠 처음으로 돌아가기
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-4">
+        <button 
+          onClick={() => router.push("/")} 
+          className="btn-secondary shadow-2xl"
+        >
+          🏠 홈으로
+        </button>
+        <button 
+          onClick={() => router.push(`/cook/${recipe.id}`)} 
+          className="btn-primary shadow-2xl flex items-center gap-2"
+        >
+          <span>🍳</span>
+          <span>요리 시작하기 (AI 코치)</span>
         </button>
       </div>
     </div>
